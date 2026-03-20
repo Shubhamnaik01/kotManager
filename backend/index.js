@@ -6,6 +6,7 @@ import itemRoutes from "./routes/itemRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import { authCheck } from "./middelware/auth.middelware.js";
 import { WebSocketServer } from "ws";
+import cors from "cors";
 import Order from "./models/Orders.js";
 
 dotenv.config();
@@ -13,6 +14,12 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 let wss;
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  }),
+);
 
 app.use(express.json());
 app.use((req, res, next) => {

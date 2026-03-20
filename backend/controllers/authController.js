@@ -17,7 +17,11 @@ export const registerUser = async (req, res) => {
     res.status(201).json({ message: "User Registered", user_id: result._id });
   } catch (error) {
     console.log("Error while creating the user in server :", error.message);
-    res.status(500).send("Internal server error");
+    if (error.name == "ValidationError") {
+      const msg = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: msg.join(" ") });
+    }
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -26,7 +30,7 @@ export const userLogin = async (req, res) => {
     const { email, password } = req.body;
     const userExits = await User.findOne({ email });
     if (!userExits) {
-      return res.status(400).send({ message: "Invalid User" });
+      return res.status(400).json({ message: "Invalid User" });
     }
     const passMatch = await bcrypt.compare(password, userExits.password);
     if (!passMatch) {
@@ -44,6 +48,6 @@ export const userLogin = async (req, res) => {
     });
   } catch (error) {
     console.log("Error in Server while logging in", error.message);
-    res.status(500).send("Internal server error");
+    res.status(500).json({ message: "Internal server error" });
   }
 };
