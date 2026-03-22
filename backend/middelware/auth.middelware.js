@@ -9,7 +9,6 @@ export const authCheck = (req, res, next) => {
     const token = authHeader.split(" ")[1];
 
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decode);
     if (decode) {
       req["user"] = decode;
       return next();

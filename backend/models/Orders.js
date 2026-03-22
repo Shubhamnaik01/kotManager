@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema(
       min: [1, "The order should have atleast one quantity"],
       required: true,
     },
+    cuisine: { type: String, required: true },
     foodType: { type: String, enum: ["veg", "non-veg"], required: true },
   },
   { timestamps: true },

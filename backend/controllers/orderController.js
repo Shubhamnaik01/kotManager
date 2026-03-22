@@ -27,6 +27,59 @@ export const createNewOrder = async (req, res) => {
   }
 };
 
+export const updateOrder = async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const lowerCaseFoodType = req.body.foodType.toLowerCase();
+    const result = await Order.findByIdAndUpdate(
+      order_id,
+      { $set: { ...req.body, foodType: lowerCaseFoodType } },
+      { new: true, runValidators: true },
+    );
+    if (!result) {
+      return res.status(404).json({ message: "Order does not exisit" });
+    }
+    res.status(200).json({ message: "Update Successfull", payload: result });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal server Error" });
+  }
+};
+
+export const deleteOrder = async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const result = await Order.findByIdAndDelete(order_id);
+    if (!result) {
+      return res.status(400).json({ message: "Order does not exist" });
+    }
+    return res.status(200).json({ message: "Order deleted" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal server Error" });
+  }
+};
+
+export const updateStatusOnly = async (req, res) => {
+  try {
+    const order_id = req.params.id;
+    const { orderStatus } = req.body;
+    const result = await Order.findByIdAndUpdate(
+      order_id,
+      { $set: { orderStatus } },
+      { new: true, runValidators: true },
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: "Order does not exist" });
+    }
+    res.status(200).json({ message: "Order Status updated", payload: result });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Internal server Error" });
+  }
+};
+
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find();

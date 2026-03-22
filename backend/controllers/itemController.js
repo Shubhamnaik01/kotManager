@@ -44,6 +44,10 @@ export const updateItem = async (req, res) => {
       { new: true },
     );
 
+    if (!result) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
     res.status(201).json({ message: "Update Successfull", data: result });
   } catch (error) {
     console.log("Error in server while updating notes", error.message);
@@ -57,7 +61,7 @@ export const deleteItem = async (req, res) => {
     const result = await Items.findByIdAndDelete(id);
 
     if (!result) {
-      return res.status(404).json({ message: "Item not found " });
+      return res.status(404).json({ message: "Item not found" });
     }
     res
       .status(200)
@@ -71,7 +75,7 @@ export const deleteItem = async (req, res) => {
 export const getAllItems = async (req, res) => {
   try {
     const result = await Items.find();
-    res
+    return res
       .status(200)
       .json({ message: "Get all items successfull", data: result });
   } catch (error) {
