@@ -17,6 +17,53 @@ const Home = () => {
     setIsItem(false);
   };
 
+  const updateOrder = async (newData) => {
+    try {
+      const result = await api.post("/orders/update/" + newData._id, newData);
+      if (result.status == "200") {
+        const updatedOrder = orders.map((i) => {
+          if (i._id == newData._id) {
+            return result.data.payload;
+          }
+          return i;
+        });
+        setOrders(updatedOrder);
+        notification(result.data.message, "success");
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reacheable or Internal server error", "error");
+      } else {
+        console.log("Error in code ", error.message);
+      }
+    }
+  };
+
+  const deleteOrder = async (id) => {
+    try {
+      const order_id = id;
+      const result = await api.delete("/orders/delete/" + order_id);
+      if (result.status == "200") {
+        setOrders((prev) => {
+          return prev.filter((i) => {
+            return i._id != order_id;
+          });
+        });
+        notification(result.data.message, "success");
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reacheable or Internal server error", "error");
+      } else {
+        console.log("Error in code ", error.message);
+      }
+    }
+  };
+
   const createOrder = async (data) => {
     try {
       const result = await api.post("/orders/create", data);
@@ -26,6 +73,7 @@ const Home = () => {
       }
     } catch (error) {
       if (error.response?.data?.message) {
+        console.log(error.response.data.message);
         notification(error.response.data.message, "error");
       } else if (error.request) {
         notification("Server not reacheable or Internal server error", "error");
@@ -116,6 +164,9 @@ const Home = () => {
           orders.map((i, k) => (
             <Order
               key={k}
+              _id={i._id}
+              deleteOrder={deleteOrder}
+              updateOrder={updateOrder}
               itemName={i.itemName}
               qty={i.qty}
               foodType={i.foodType}

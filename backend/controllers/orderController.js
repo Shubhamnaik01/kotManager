@@ -21,7 +21,7 @@ export const createNewOrder = async (req, res) => {
       const msg = Object.values(error.errors).map((err) => err.message);
       return res
         .status(400)
-        .json({ message: "Validation error", message: msg });
+        .json({ message: "Validation error", message: msg[0] });
     }
     res.status(500).json({ message: "Internal server error" });
   }
@@ -41,6 +41,10 @@ export const updateOrder = async (req, res) => {
     }
     res.status(200).json({ message: "Update Successfull", payload: result });
   } catch (error) {
+    if (error.name == "ValidationError") {
+      const msg = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: msg[0] });
+    }
     console.log(error.message);
     res.status(500).json({ message: "Internal server Error" });
   }
