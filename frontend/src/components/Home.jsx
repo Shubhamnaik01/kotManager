@@ -115,6 +115,7 @@ const Home = () => {
         },
       });
       if (result.status == "200") {
+        console.log(result.data.data);
         setItems(result.data.data);
       }
     } catch (error) {

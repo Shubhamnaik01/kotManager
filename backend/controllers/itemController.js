@@ -21,6 +21,10 @@ export const createItem = async (req, res) => {
     console.log(result);
     res.status(201).json({ message: "Item added", data: result });
   } catch (error) {
+    if (error.name == "ValidationError") {
+      const msg = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: msg[0] });
+    }
     console.log("Error in server while creating item", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
