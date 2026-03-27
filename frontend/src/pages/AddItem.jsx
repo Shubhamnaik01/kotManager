@@ -50,10 +50,10 @@ const AddItem = () => {
         // setPrice({});
       }
     } catch (error) {
-      if (error.response?.data?.error) {
-        notification(error.response.data.error, "success");
-      } else if (error.request) {
+      if (error.response?.data?.message) {
         notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reachable or Internal Server error", "error");
       } else {
         console.log("Error in code ", error.message);
       }

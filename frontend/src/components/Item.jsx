@@ -53,8 +53,6 @@ const Item = (props) => {
         finalUpdate.price.full = price.full;
       }
 
-      // console.log(finalUpdate);
-
       const result = await api.put("/items/update/" + props._id, finalUpdate);
       if (result.status == "200") {
         props.updateItemParent(result.data.payload);
@@ -68,6 +66,24 @@ const Item = (props) => {
         notification("Server not reachable or Internal server error", "error");
       } else {
         console.log("Error in code", error.message);
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const result = await api.delete("/items/remove/" + props._id);
+      if (result.status == 200) {
+        notification(result.data.message, "success");
+        props.deleteItem(props._id);
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reachable or Internal Server error", "error");
+      } else {
+        console.log("Error in code ", error.message);
       }
     }
   };
@@ -187,7 +203,7 @@ const Item = (props) => {
         </button>
       </div>
       <button
-        onClick={() => handleDelete(!editStatus)}
+        onClick={handleDelete}
         className="bg-red-600 text-white hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
       >
         Delete

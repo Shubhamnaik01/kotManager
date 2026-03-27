@@ -116,6 +116,14 @@ const Home = () => {
     setItems(updatedItem);
   };
 
+  const deleteItem = (id) => {
+    console.log(id);
+    const updatedItemList = items.filter((i) => {
+      return i._id != id;
+    });
+    setItems(updatedItemList);
+  };
+
   const getAllItems = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -161,6 +169,7 @@ const Home = () => {
                 <Item
                   key={k}
                   _id={i._id}
+                  deleteItem={deleteItem}
                   createOrder={createOrder}
                   itemName={i.itemName}
                   updateItemParent={updateItemParent}
