@@ -35,7 +35,7 @@ export const updateItem = async (req, res) => {
     const updates = req.body;
     const item_id = req.params.id;
     const finalUpdate = { ...updates };
-
+    console.log(finalUpdate.price);
     if (updates.price) {
       if (updates.price.half) finalUpdate["price.half"] = updates.price.half;
       if (updates.price.full) finalUpdate["price.full"] = updates.price.full;
@@ -45,15 +45,19 @@ export const updateItem = async (req, res) => {
     const result = await Items.findByIdAndUpdate(
       item_id,
       { $set: finalUpdate },
-      { new: true },
+      { new: true, runValidators: true },
     );
 
     if (!result) {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    res.status(201).json({ message: "Update Successfull", data: result });
+    res.status(200).json({ message: "Update Successfull", payload: result });
   } catch (error) {
+    if (error.name == "ValidationError") {
+      const msg = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: msg[0] });
+    }
     console.log("Error in server while updating notes", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }

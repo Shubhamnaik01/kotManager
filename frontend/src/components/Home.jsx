@@ -106,6 +106,16 @@ const Home = () => {
     }
   };
 
+  const updateItemParent = (data) => {
+    const updatedItem = items.map((i, k) => {
+      if (i._id == data._id) {
+        return data;
+      }
+      return i;
+    });
+    setItems(updatedItem);
+  };
+
   const getAllItems = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -150,8 +160,10 @@ const Home = () => {
               return (
                 <Item
                   key={k}
+                  _id={i._id}
                   createOrder={createOrder}
                   itemName={i.itemName}
+                  updateItemParent={updateItemParent}
                   price={i.price}
                   cuisine={i.cuisine}
                   foodType={i.foodType}

@@ -1,17 +1,75 @@
 import React, { useEffect, useState } from "react";
+import api from "../lib/axiosBase";
+import notification from "../lib/toastNotify";
 
 const Item = (props) => {
+  const [editStatus, setEditStatus] = useState(false);
+  const [itemName, setItemName] = useState(props.itemName);
+  const [foodType, setFoodType] = useState(props.foodType);
+  const [cuisine, setCuisine] = useState(props.cuisine);
+  const [price, setPrice] = useState({
+    half: props.price.half || "",
+    full: props.price.full || "",
+  });
   const [qty, setQty] = useState(0);
 
   const handleOrderClick = () => {
     const currentData = {
-      itemName: props.itemName,
+      itemName: itemName,
       qty: qty,
-      cuisine: props.cuisine,
-      foodType: props.foodType,
+      cuisine: cuisine,
+      foodType: foodType,
     };
 
     props.createOrder(currentData);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const finalUpdate = {
+        itemName,
+        cuisine,
+        foodType: foodType.toLowerCase(),
+        price,
+      };
+      if (price.hasOwnProperty("full")) {
+        if (price.full == "") {
+          delete price.full;
+        } else if (isNaN(price.full)) {
+          return notification("Please enter a valid number", "error");
+        }
+      }
+      if (price.hasOwnProperty("half")) {
+        if (price.half == "") {
+          delete price.half;
+        } else if (isNaN(price.half)) {
+          return notification("Please enter a valid number", "error");
+        }
+      }
+      if (price.half && !isNaN(price.half)) {
+        finalUpdate.price.half = price.half;
+      }
+      if (price.full && !isNaN(price.full)) {
+        finalUpdate.price.full = price.full;
+      }
+
+      // console.log(finalUpdate);
+
+      const result = await api.put("/items/update/" + props._id, finalUpdate);
+      if (result.status == "200") {
+        props.updateItemParent(result.data.payload);
+        notification(result.data.message, "success");
+        setEditStatus(false);
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reachable or Internal server error", "error");
+      } else {
+        console.log("Error in code", error.message);
+      }
+    }
   };
 
   const increaseQty = () => {
@@ -27,13 +85,62 @@ const Item = (props) => {
 
   return (
     <div className="w-full max-w-sm bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">
-      <h2 className="font-bold text-2xl">{props.itemName}</h2>
+      {editStatus ? (
+        <input
+          className="w-full max-w-sm p-2 bg-white"
+          value={itemName}
+          onChange={(e) => {
+            setItemName(e.target.value);
+          }}
+        />
+      ) : (
+        <h2 className="font-bold text-2xl">{props.itemName}</h2>
+      )}
       <div className="w-full max-w-sm flex justify-around">
-        <h4>{props.foodType}</h4>
-        <h4>{props.cuisine}</h4>
+        {editStatus ? (
+          <input
+            className="w-full max-w-sm p-2 bg-white"
+            value={foodType}
+            onChange={(e) => {
+              setFoodType(e.target.value);
+            }}
+          />
+        ) : (
+          <h4>{props.foodType}</h4>
+        )}
+        {editStatus ? (
+          <input
+            className="w-full max-w-sm p-2 bg-white"
+            value={cuisine}
+            onChange={(e) => setCuisine(e.target.value)}
+          />
+        ) : (
+          <h4>{props.cuisine}</h4>
+        )}
       </div>
       <p>
-        Price - Half : {props.price.half} | Full : {props.price.full}
+        Price - Half :{" "}
+        {editStatus ? (
+          <input
+            className="w-full max-w-10 p-2 bg-white"
+            value={price.half}
+            onChange={(e) => {
+              setPrice({ ...price, half: e.target.value });
+            }}
+          />
+        ) : (
+          props.price.half
+        )}{" "}
+        | Full :{" "}
+        {editStatus ? (
+          <input
+            className="w-full max-w-10 p-2 bg-white"
+            value={price.full}
+            onChange={(e) => setPrice({ ...price, full: e.target.value })}
+          />
+        ) : (
+          props.price.full
+        )}
       </p>
       <p>Qty : {qty}</p>
       <div className="flex justify-center items-center gap-2">
@@ -54,11 +161,36 @@ const Item = (props) => {
           -
         </button>
       </div>
+      <div className="w-full max-w-sm flex justify-around items-center">
+        {editStatus ? (
+          <button
+            className="bg-orange-400 text-white hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
+            onClick={() => {
+              handleUpdate();
+            }}
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            onClick={() => handleOrderClick()}
+            className="bg-orange-400 text-white  hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
+          >
+            Order
+          </button>
+        )}
+        <button
+          onClick={() => setEditStatus(!editStatus)}
+          className="bg-orange-400 text-white hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
+        >
+          Edit
+        </button>
+      </div>
       <button
-        onClick={() => handleOrderClick()}
-        className="bg-orange-400 hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
+        onClick={() => handleDelete(!editStatus)}
+        className="bg-red-600 text-white hover:bg-amber-500 p-2 rounded-sm active:scale-90 transition-all"
       >
-        Order
+        Delete
       </button>
     </div>
   );
