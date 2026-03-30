@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import api from "../lib/axiosBase";
 import notification from "../lib/toastNotify";
@@ -10,6 +10,12 @@ const Order = (props) => {
   const [foodType, setFoodType] = useState(props.foodType);
   const [cuisine, setCuisine] = useState(props.cuisine);
   const [qty, setQty] = useState(props.qty);
+
+  // console.log(status);
+
+  useEffect(() => {
+    setStatus(props.status);
+  }, [props.status]);
 
   return (
     <div className="w-full max-w-sm bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">

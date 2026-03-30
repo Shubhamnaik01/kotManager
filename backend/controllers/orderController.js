@@ -39,6 +39,11 @@ export const updateOrder = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Order does not exisit" });
     }
+    req.wss.clients.forEach((client) => {
+      if (client.role == "kitchen") {
+        client.send(JSON.stringify({ type: "Update", payload: result }));
+      }
+    });
     res.status(200).json({ message: "Update Successfull", payload: result });
   } catch (error) {
     if (error.name == "ValidationError") {
@@ -57,6 +62,19 @@ export const deleteOrder = async (req, res) => {
     if (!result) {
       return res.status(400).json({ message: "Order does not exist" });
     }
+    req.wss.clients.forEach((client) => {
+      // console.log("<<<<Delted Controler>>>>>");
+      // console.log(`Socket ID: ${client.id} | Role: ${client.role}`);
+      if (client.readyState === 1) {
+        // if (client.role == "kitchen") {     Order can  be delted by both client and kitchen in case of unavailability of raw material
+        client.send(JSON.stringify({ type: "Delete", payload: result }));
+        // } else {
+        //   console.log(`Skipping client because role is: ${client.role}`);
+        // }
+      } else {
+        console.log("Client not connected ");
+      }
+    });
     return res.status(200).json({ message: "Order deleted" });
   } catch (error) {
     console.log(error.message);
@@ -77,6 +95,22 @@ export const updateStatusOnly = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Order does not exist" });
     }
+    console.log("update succssfull");
+
+    req.wss.clients.forEach((client) => {
+      // console.log(
+      //   `DEBUG: ID=${client.id} | Role=${client.role} | Status=${client.readyState}`,
+      // );
+      if (client.readyState == 1) {
+        if (client.role == "counter") {
+          client.send(
+            JSON.stringify({ type: "UpdateOnlyStatus", payload: result }),
+          );
+        }
+      } else {
+        console.log("Client not connected ");
+      }
+    });
     res.status(200).json({ message: "Order Status updated", payload: result });
   } catch (error) {
     console.log(error.message);

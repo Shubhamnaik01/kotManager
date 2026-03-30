@@ -5,7 +5,7 @@ import notification from "../lib/toastNotify";
 import Item from "./Item";
 import Order from "./Order";
 
-const Home = () => {
+const Home = ({ socket, role }) => {
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [isItem, setIsItem] = useState(true);
@@ -19,7 +19,9 @@ const Home = () => {
 
   const updateOrder = async (newData) => {
     try {
-      const result = await api.post("/orders/update/" + newData._id, newData);
+      const path =
+        role != "kitchen" ? "/orders/update/" : "/orders/updateStatus/";
+      const result = await api.post(path + newData._id, newData);
       if (result.status == "200") {
         const updatedOrder = orders.map((i) => {
           if (i._id == newData._id) {
@@ -68,7 +70,7 @@ const Home = () => {
     try {
       const result = await api.post("/orders/create", data);
       if (result.status == "201") {
-        setOrders((prev) => [[...prev, result.data.createdOrder]]);
+        setOrders((prev) => [...prev, result.data.createdOrder]);
         notification(result.data.message, "success");
       }
     } catch (error) {
@@ -154,6 +156,58 @@ const Home = () => {
       getAllOrders();
     }
   }, [isItem]);
+
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
+    const handleMessage = (event) => {
+      const result = JSON.parse(event.data);
+      console.log(result);
+
+      if (result.type == "Initial") {
+        setOrders((prev) => {
+          return prev.length > 0 ? prev : result.payload;
+        });
+      } else if (result.type == "NewOrder") {
+        setOrders((prev) => [...prev, result.payload]);
+      } else if (result.type == "Delete") {
+        setOrders((prev) => {
+          const orders = prev.filter((i) => i._id != result.payload._id);
+          return orders;
+        });
+      } else if (result.type == "Update") {
+        setOrders((prev) => {
+          const orders = prev.map((i) => {
+            if (i._id == result.payload._id) {
+              return result.payload;
+            }
+            return i;
+          });
+          return orders;
+        });
+      } else if (result.type == "UpdateOnlyStatus") {
+        setOrders((prev) => {
+          console.log(result);
+          const orders = prev.map((i) => {
+            if (i._id == result.payload._id) {
+              return result.payload;
+            }
+            return i;
+          });
+          return orders;
+        });
+      }
+    };
+
+    socket.addEventListener("message", handleMessage);
+
+    return () => {
+      notification("Listener Removed Websocket", "success");
+      socket.removeEventListener("message", handleMessage);
+    };
+  }, [socket]);
   return (
     <div>
       <Nav
@@ -167,7 +221,7 @@ const Home = () => {
             items.map((i, k) => {
               return (
                 <Item
-                  key={k}
+                  key={i._id}
                   _id={i._id}
                   deleteItem={deleteItem}
                   createOrder={createOrder}
@@ -185,7 +239,7 @@ const Home = () => {
         ) : orders.length > 0 ? (
           orders.map((i, k) => (
             <Order
-              key={k}
+              key={i._id}
               _id={i._id}
               deleteOrder={deleteOrder}
               updateOrder={updateOrder}
