@@ -215,7 +215,7 @@ const Home = ({ socket }) => {
         selectItems={selectItems}
         selectOrders={selectOrders}
       />
-      <div className=" p-10 gap-4 flex">
+      <div className=" p-10 gap-4 flex flex-wrap">
         {isItem ? (
           items.length > 0 ? (
             items.map((i, k) => {

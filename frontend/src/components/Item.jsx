@@ -100,7 +100,7 @@ const Item = (props) => {
   };
 
   return (
-    <div className="w-full max-w-sm bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">
+    <div className="w-full max-w-2xs bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">
       {editStatus ? (
         <input
           className="w-full max-w-sm p-2 bg-white"

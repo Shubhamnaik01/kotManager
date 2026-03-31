@@ -17,6 +17,9 @@ function App() {
   // }
 
   useEffect(() => {
+    if (!role) {
+      return;
+    }
     const ws = new WebSocket("ws://localhost:2000");
     ws.onopen = () => {
       ws.send(
@@ -30,7 +33,7 @@ function App() {
     };
 
     return () => ws.close();
-  }, []);
+  }, [role]);
   return (
     <div>
       <Routes>

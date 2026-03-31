@@ -18,7 +18,7 @@ const Order = (props) => {
   }, [props.status]);
 
   return (
-    <div className="w-full max-w-sm bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">
+    <div className="w-full max-w-xs bg-[#ececeb] shadow-lg p-5 flex flex-col justify-center items-center rounded-md text-xl gap-1">
       {editState ? (
         <input
           value={itemName}
