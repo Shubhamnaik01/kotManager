@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import api from "../lib/axiosBase";
 import { Link, useNavigate } from "react-router-dom";
 import notification from "../lib/toastNotify";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { assignUserDetails } = useAuthStore();
 
   const handleLogin = async (e) => {
     try {
@@ -14,8 +16,9 @@ const Login = () => {
       const result = await api.post("/auth/login", { email, password });
       if (result.status == 200) {
         localStorage.setItem("token", result.data.token);
+        assignUserDetails(result.data.user);
+        console.log(result.data.user);
         notification(result.data.message, "success");
-        console.log(result.data.user.role);
         navigate("/home", { replace: true });
       }
     } catch (error) {

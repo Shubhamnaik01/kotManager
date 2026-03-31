@@ -44,7 +44,7 @@ export const userLogin = async (req, res) => {
     return res.status(200).json({
       message: "User login successfull",
       token,
-      user: { id: userExits._id, name: userExits.name, role: userExits.role },
+      user: { _id: userExits._id, name: userExits.name, role: userExits.role },
     });
   } catch (error) {
     console.log("Error in Server while logging in", error.message);

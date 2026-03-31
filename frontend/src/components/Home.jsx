@@ -4,11 +4,13 @@ import api from "../lib/axiosBase";
 import notification from "../lib/toastNotify";
 import Item from "./Item";
 import Order from "./Order";
+import { useAuthStore } from "../store/useAuthStore";
 
-const Home = ({ socket, role }) => {
+const Home = ({ socket }) => {
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [isItem, setIsItem] = useState(true);
+  const { role } = useAuthStore();
 
   const selectItems = () => {
     setIsItem(true);
@@ -30,7 +32,6 @@ const Home = ({ socket, role }) => {
           return i;
         });
         setOrders(updatedOrder);
-        notification(result.data.message, "success");
       }
     } catch (error) {
       if (error.response?.data?.message) {
@@ -204,7 +205,6 @@ const Home = ({ socket, role }) => {
     socket.addEventListener("message", handleMessage);
 
     return () => {
-      notification("Listener Removed Websocket", "success");
       socket.removeEventListener("message", handleMessage);
     };
   }, [socket]);

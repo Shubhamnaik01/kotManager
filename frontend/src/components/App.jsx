@@ -5,28 +5,28 @@ import { ToastContainer, Flip } from "react-toastify";
 import Register from "../pages/Register";
 import AddItem from "../pages/AddItem";
 import { useEffect, useState } from "react";
+import { useAuthStore } from "../store/useAuthStore";
 function App() {
   const [socket, setSocket] = useState(null);
+  const { userName, role } = useAuthStore();
+  // const params = new URLSearchParams(window.location.search);
+  // const urlRole = params.get("role") || "counter";
 
-  const params = new URLSearchParams(window.location.search);
-  const urlRole = params.get("role") || "counter";
-
-  if (urlRole) {
-    localStorage.setItem("role", urlRole);
-  }
-  const myRole = localStorage.getItem("role");
+  // if (urlRole) {
+  //   localStorage.setItem("role", urlRole);
+  // }
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:2000");
     ws.onopen = () => {
       ws.send(
         JSON.stringify({
-          role: myRole,
-          name: `User-${myRole}`,
+          role: role,
+          name: `User-${role}`,
         }),
       );
       setSocket(ws);
-      console.log(myRole + " Connected");
+      console.log(role + " Connected");
     };
 
     return () => ws.close();
@@ -37,7 +37,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/createItem" element={<AddItem />} />
-        <Route path="/home" element={<Home socket={socket} role={myRole} />} />
+        <Route path="/home" element={<Home socket={socket} />} />
       </Routes>
       <ToastContainer
         position="top-center"
