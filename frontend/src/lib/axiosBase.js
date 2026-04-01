@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const isProduction = import.meta.env.MODE == "production" ? true : false;
+const isProduction = import.meta.env.MODE == "production";
 
 const base = isProduction ? "/api" : "http://localhost:2000/api/";
 

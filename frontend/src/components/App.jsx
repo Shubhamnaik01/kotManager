@@ -20,7 +20,13 @@ function App() {
     if (!role) {
       return;
     }
-    const ws = new WebSocket("ws://localhost:2000");
+
+    const wsProtocol = window.location.protocol == "https:" ? "wss" : "ws";
+    const host =
+      import.meta.env.MODE == "production"
+        ? window.location.host
+        : "localhost:2000";
+    const ws = new WebSocket(`${wsProtocol}://${host}`);
     ws.onopen = () => {
       ws.send(
         JSON.stringify({

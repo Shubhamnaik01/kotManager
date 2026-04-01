@@ -1,0 +1,22 @@
+{
+  "name": "kotmanager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm i --prefix frontend && npm i --prefix backend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shubhamnaik01/kotManager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shubhamnaik01/kotManager/issues"
+  },
+  "homepage": "https://github.com/Shubhamnaik01/kotManager#readme"
+}

@@ -6,6 +6,7 @@ import itemRoutes from "./routes/itemRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import { authCheck } from "./middelware/auth.middelware.js";
 import { WebSocketServer } from "ws";
+import path from "path";
 import cors from "cors";
 import Order from "./models/Orders.js";
 
@@ -13,14 +14,18 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
+const isProduction = process.env.NODE_ENV == "production";
+const __dirname = path.resolve();
 let wss;
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  }),
-);
+if (!isProduction) {
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+      credentials: true,
+    }),
+  );
+}
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -31,6 +36,14 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/items", authCheck, itemRoutes);
 app.use("/api/orders", authCheck, orderRoutes);
+
+if (isProduction) {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("/*splat", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
 connectDB().then(() => {
   const server = app.listen(port, () => {
