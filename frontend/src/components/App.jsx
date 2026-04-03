@@ -1,14 +1,15 @@
 import Home from "./Home";
 import Login from "../pages/Login";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer, Flip } from "react-toastify";
 import Register from "../pages/Register";
 import AddItem from "../pages/AddItem";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
+import Loading from "./Loading";
 function App() {
   const [socket, setSocket] = useState(null);
-  const { userName, role } = useAuthStore();
+  const { loading, role } = useAuthStore();
   // const params = new URLSearchParams(window.location.search);
   // const urlRole = params.get("role") || "counter";
 
@@ -43,10 +44,25 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/createItem" element={<AddItem />} />
-        <Route path="/home" element={<Home socket={socket} />} />
+        <Route path="/" element={role ? <Navigate to="/home" /> : <Login />} />
+        <Route
+          path="/register"
+          element={role ? <Navigate to="/home" /> : <Register />}
+        />
+        <Route
+          path="/createItem"
+          element={!role ? <Navigate to="/" replace={true} /> : <AddItem />}
+        />
+        <Route
+          path="/home"
+          element={
+            !role ? (
+              <Navigate to="/" replace={true} />
+            ) : (
+              <Home socket={socket} />
+            )
+          }
+        />
       </Routes>
       <ToastContainer
         position="top-center"

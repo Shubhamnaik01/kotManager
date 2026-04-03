@@ -17,7 +17,6 @@ const Login = () => {
       if (result.status == 200) {
         localStorage.setItem("token", result.data.token);
         assignUserDetails(result.data.user);
-        console.log(result.data.user);
         notification(result.data.message, "success");
         navigate("/home", { replace: true });
       }
