@@ -14,7 +14,20 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRound);
 
     const result = await User.create({ name, email, password: hashedPassword });
-    res.status(201).json({ message: "User Registered", user_id: result._id });
+
+    const token = jwt.sign(
+      {
+        _id: result._id,
+        role: result.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+    res.status(201).json({
+      message: "User Registered",
+      token,
+      user: { _id: result._id, name: result.name, role: result.role },
+    });
   } catch (error) {
     console.log("Error while creating the user in server :", error.message);
     if (error.name == "ValidationError") {

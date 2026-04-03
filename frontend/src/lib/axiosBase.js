@@ -28,6 +28,7 @@ baseURL.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
+      console.log("Error :", error.response.data.message);
       localStorage.removeItem("token");
       window.location.href = "/";
     }

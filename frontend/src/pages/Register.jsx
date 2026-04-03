@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import api from "../lib/axiosBase";
 import notification from "../lib/toastNotify";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  const { assignUserDetails } = useAuthStore();
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -18,6 +19,8 @@ const Register = () => {
         password,
       });
       if (result?.status == 201) {
+        assignUserDetails(result.data.user);
+        localStorage.setItem("token", result.data.token);
         notification(result.data.message, "success");
         navigate("/home", { replace: true });
       }
