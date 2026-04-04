@@ -9,14 +9,33 @@ import { useAuthStore } from "../store/useAuthStore";
 const Home = ({ socket }) => {
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [isItem, setIsItem] = useState(true);
+  const [currentTab, setCurrentTab] = useState({
+    isItem: true,
+    isOrder: false,
+    isAddItem: false,
+  });
   const { role } = useAuthStore();
 
   const selectItems = () => {
-    setIsItem(true);
+    setCurrentTab((prev) => ({
+      isItem: true,
+      isOrder: false,
+      isAddItem: false,
+    }));
   };
   const selectOrders = () => {
-    setIsItem(false);
+    setCurrentTab((prev) => ({
+      isItem: false,
+      isOrder: true,
+      isAddItem: false,
+    }));
+  };
+  const selectAddItem = () => {
+    setCurrentTab((prev) => ({
+      isItem: false,
+      isOrder: false,
+      isAddItem: true,
+    }));
   };
 
   const updateOrder = async (newData) => {
@@ -151,12 +170,12 @@ const Home = ({ socket }) => {
   };
 
   useEffect(() => {
-    if (isItem) {
+    if (currentTab.isItem) {
       getAllItems();
     } else {
       getAllOrders();
     }
-  }, [isItem]);
+  }, [currentTab]);
 
   useEffect(() => {
     if (!socket) {
@@ -211,12 +230,13 @@ const Home = ({ socket }) => {
   return (
     <div>
       <Nav
-        isItem={isItem}
+        currentTab={currentTab}
         selectItems={selectItems}
         selectOrders={selectOrders}
+        selectAddItem={selectAddItem}
       />
       <div className=" p-10 gap-4 flex flex-wrap">
-        {isItem ? (
+        {currentTab.isItem ? (
           items.length > 0 ? (
             items.map((i, k) => {
               return (

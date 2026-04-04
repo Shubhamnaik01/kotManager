@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import notification from "../lib/toastNotify";
 
 const Nav = (props) => {
-  const { logout } = useAuthStore();
+  const { logout, role } = useAuthStore();
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -20,24 +20,33 @@ const Nav = (props) => {
         <ul className="w-full max-w-60 flex justify-around text-md">
           <li
             onClick={() => props.selectItems()}
-            className={props.isItem ? "text-orange-400 underline" : ""}
+            className={
+              props.currentTab.isItem ? "text-orange-400 underline" : ""
+            }
           >
             Items
           </li>
           <li
             onClick={() => props.selectOrders()}
-            className={!props.isItem ? "text-orange-400 underline" : ""}
+            className={
+              props.currentTab.isOrder ? "text-orange-400 underline" : ""
+            }
           >
             Orders
           </li>
-          <li
-            onClick={() => {
-              navigate("/createItem");
-            }}
-            className={!props.isItem ? "text-orange-400 underline" : ""}
-          >
-            Create Item
-          </li>
+          {role == "counter" && (
+            <li
+              onClick={() => {
+                props.selectAddItem();
+                navigate("/createItem");
+              }}
+              className={
+                props.currentTab.isAddItem ? "text-orange-400 underline" : ""
+              }
+            >
+              Create Item
+            </li>
+          )}
         </ul>
         <button
           onClick={handleLogout}
