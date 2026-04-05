@@ -46,3 +46,20 @@ export const deleteUser = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const result = await userModel.find().select("-password");
+    if (result.length == 0) {
+      return res
+        .status(200)
+        .json({ message: "No users found ", payload: result });
+    }
+    return res
+      .status(200)
+      .json({ message: "Fetched all users", payload: result });
+  } catch (error) {
+    console.log("Error in server while fetching users", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
