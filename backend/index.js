@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import itemRoutes from "./routes/itemRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import { authCheck } from "./middelware/auth.middelware.js";
 import { WebSocketServer } from "ws";
 import path from "path";
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/items", authCheck, itemRoutes);
 app.use("/api/orders", authCheck, orderRoutes);
+app.use("/api/users", authCheck, userRoutes);
 
 if (isProduction) {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
