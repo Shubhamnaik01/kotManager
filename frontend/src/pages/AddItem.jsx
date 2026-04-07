@@ -3,12 +3,14 @@ import { useState } from "react";
 import api from "../lib/axiosBase";
 import notification from "../lib/toastNotify";
 import { useNavigate } from "react-router-dom";
+import { currentTabStore } from "../store/useNavigationStore";
 
 const AddItem = () => {
   const [itemName, setItemName] = useState("");
   const [cuisine, setCuisine] = useState("");
   const [foodType, setFoodType] = useState("");
   const [price, setPrice] = useState({});
+  const { selectItems } = currentTabStore();
 
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
@@ -102,7 +104,10 @@ const AddItem = () => {
         <button
           type="button"
           className="p-2 bg-white rounded-md"
-          onClick={() => navigate("/home")}
+          onClick={() => {
+            selectItems();
+            navigate("/home");
+          }}
         >
           Back to Items
         </button>

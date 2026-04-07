@@ -1,6 +1,6 @@
 import Home from "./Home";
 import Login from "../pages/Login";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { ToastContainer, Flip } from "react-toastify";
 import Register from "../pages/Register";
 import AddItem from "../pages/AddItem";
@@ -11,6 +11,7 @@ import ManageUser from "../pages/ManageUser";
 function App() {
   const [socket, setSocket] = useState(null);
   const { role } = useAuthStore();
+  const navigate = useNavigate();
   // const params = new URLSearchParams(window.location.search);
   // const urlRole = params.get("role") || "counter";
 
@@ -21,6 +22,10 @@ function App() {
   useEffect(() => {
     if (!role) {
       return;
+    }
+
+    if (role == "admin") {
+      navigate("/manageUser");
     }
 
     const wsProtocol = window.location.protocol == "https:" ? "wss" : "ws";

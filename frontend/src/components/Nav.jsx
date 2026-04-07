@@ -2,14 +2,25 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import notification from "../lib/toastNotify";
+import { currentTabStore } from "../store/useNavigationStore";
 
 const Nav = (props) => {
   const { logout, role } = useAuthStore();
+  const {
+    isItem,
+    isOrder,
+    isAddItem,
+    selectAddItem,
+    selectItems,
+    selectOrders,
+    resetTabs,
+  } = currentTabStore();
 
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
     logout();
+    resetTabs();
     navigate("/", { replace: true });
     notification("Logged Out", "success");
   };
@@ -18,31 +29,29 @@ const Nav = (props) => {
       <nav className="w-full flex justify-between items-center mx-8">
         <h2 className="text-2xl font-logo text-orange-400">KOT</h2>
         <ul className="w-full max-w-60 flex justify-around text-md">
-          <li
-            onClick={() => props.selectItems()}
-            className={
-              props.currentTab.isItem ? "text-orange-400 underline" : ""
-            }
-          >
-            Items
-          </li>
-          <li
-            onClick={() => props.selectOrders()}
-            className={
-              props.currentTab.isOrder ? "text-orange-400 underline" : ""
-            }
-          >
-            Orders
-          </li>
+          {role != "admin" && (
+            <li
+              onClick={() => selectItems()}
+              className={isItem ? "text-orange-400 underline" : ""}
+            >
+              Items
+            </li>
+          )}
+          {role != "admin" && (
+            <li
+              onClick={() => selectOrders()}
+              className={isOrder ? "text-orange-400 underline" : ""}
+            >
+              Orders
+            </li>
+          )}
           {role == "counter" && (
             <li
               onClick={() => {
-                props.selectAddItem();
+                selectAddItem();
                 navigate("/createItem");
               }}
-              className={
-                props.currentTab.isAddItem ? "text-orange-400 underline" : ""
-              }
+              className={isAddItem ? "text-orange-400 underline" : ""}
             >
               Create Item
             </li>
