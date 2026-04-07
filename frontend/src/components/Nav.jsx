@@ -31,7 +31,10 @@ const Nav = (props) => {
         <ul className="w-full max-w-60 flex justify-around text-md">
           {role != "admin" && (
             <li
-              onClick={() => selectItems()}
+              onClick={() => {
+                selectItems();
+                navigate("/home");
+              }}
               className={isItem ? "text-orange-400 underline" : ""}
             >
               Items
@@ -39,7 +42,10 @@ const Nav = (props) => {
           )}
           {role != "admin" && (
             <li
-              onClick={() => selectOrders()}
+              onClick={() => {
+                selectOrders();
+                navigate("/home");
+              }}
               className={isOrder ? "text-orange-400 underline" : ""}
             >
               Orders
