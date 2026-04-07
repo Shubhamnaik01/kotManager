@@ -7,9 +7,10 @@ import AddItem from "../pages/AddItem";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import Loading from "./Loading";
+import ManageUser from "../pages/ManageUser";
 function App() {
   const [socket, setSocket] = useState(null);
-  const { loading, role } = useAuthStore();
+  const { role } = useAuthStore();
   // const params = new URLSearchParams(window.location.search);
   // const urlRole = params.get("role") || "counter";
 
@@ -48,6 +49,10 @@ function App() {
         <Route
           path="/register"
           element={role ? <Navigate to="/home" /> : <Register />}
+        />
+        <Route
+          path="/manageUser"
+          element={!role ? <Login /> : <ManageUser />}
         />
         <Route
           path="/createItem"
