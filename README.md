@@ -31,3 +31,85 @@ A Full-stack MERN application built for real-time restaurant order management. T
 - **WebSockets (`ws` library)** - Bi-directional communication for live updates.
 
 ---
+
+## 📦 Local Installation & Setup
+
+Follow these steps to run the project locally.
+
+---
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/Shubhamnaik01/kotManager
+cd kotManager
+```
+
+---
+
+### 2️⃣ Install Dependencies
+
+Install dependencies for both frontend and backend:
+
+```bash
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+---
+
+### 3️⃣ Setup Environment Variables
+
+Create a `.env` file inside the **backend** folder:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+NODE_ENV=development
+```
+
+---
+
+### 4️⃣ Run the Application
+
+Start backend and frontend in separate terminals:
+
+#### ▶️ Start Backend
+
+```bash
+npm run start --prefix backend
+```
+
+#### ▶️ Start Frontend
+
+```bash
+npm run dev --prefix frontend
+```
+
+---
+
+### 5️⃣ Access the App
+
+Open your browser and go to:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🔐 Default Roles (Example)
+
+- **Admin** → Manage users
+- **Counter** → Create orders
+- **Kitchen** → Process orders (Default on Registration)
+
+---
+
+## ⚠️ Notes
+
+- Frontend runs on `http://localhost:5173`
+- WebSockets will automatically connect based on environment
+
+---
