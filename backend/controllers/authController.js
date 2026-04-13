@@ -1,8 +1,50 @@
 import User from "../models/Users.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import restaurantModel from "../models/Restaurant.js";
 
 const saltRound = 10;
+
+export const registerRestaurant = async (req, res) => {
+  try {
+    const { businessEmail, password, restaurantName } = req.body;
+    if (!password) {
+      return res
+        .status(400)
+        .json({ message: "Please enter a strong password" });
+    }
+    const restaurantExists = await restaurantModel.findOne({ businessEmail });
+    if (restaurantExists) {
+      return res.status(409).json({ message: "Restaurant already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, saltRound);
+    const result = await restaurantModel.create({
+      businessEmail,
+      password: hashedPassword,
+      restaurantName,
+    });
+
+    const token = jwt.sign(
+      {
+        res_id: result._id,
+        restaurantName: result.restaurantName,
+        role: result.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+    return res
+      .status(201)
+      .json({ message: "Restaurant registered successfully", token });
+  } catch (error) {
+    console.log("Error in server", error.message);
+    if (error.name == "ValidationError") {
+      const msg = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: msg[0] });
+    }
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const registerUser = async (req, res) => {
   try {
