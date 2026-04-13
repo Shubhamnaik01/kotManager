@@ -10,16 +10,21 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { assignUserDetails } = useAuthStore();
+
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const result = await api.post("/auth/register", {
-        name,
-        email,
+      const result = await api.post("/auth/registerRestaurant", {
+        restaurantName: name,
+        businessEmail: email,
         password,
       });
       if (result?.status == 201) {
-        assignUserDetails(result.data.user);
+        assignUserDetails({
+          _id: result.data.user.res_id,
+          role: result.data.user.role,
+          name: result.data.user.restaurantName,
+        });
         localStorage.setItem("token", result.data.token);
         notification(result.data.message, "success");
         navigate("/home", { replace: true });
@@ -42,7 +47,7 @@ const Register = () => {
       >
         <input
           type="text"
-          placeholder="name"
+          placeholder="Restaurant name"
           value={name}
           onChange={(e) => {
             setName(e.target.value);
@@ -51,7 +56,7 @@ const Register = () => {
         />
         <input
           type="text"
-          placeholder="email"
+          placeholder="Business email"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);

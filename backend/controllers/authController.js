@@ -9,9 +9,7 @@ export const registerRestaurant = async (req, res) => {
   try {
     const { businessEmail, password, restaurantName } = req.body;
     if (!password) {
-      return res
-        .status(400)
-        .json({ message: "Please enter a strong password" });
+      return res.status(400).json({ message: "All fields are required" });
     }
     const restaurantExists = await restaurantModel.findOne({ businessEmail });
     if (restaurantExists) {
@@ -36,7 +34,11 @@ export const registerRestaurant = async (req, res) => {
     return res.status(201).json({
       message: "Restaurant registered successfully",
       token,
-      restaurant: { restaurantName: result.restaurantName, role: result.role },
+      user: {
+        restaurantName: result.restaurantName,
+        role: result.role,
+        res_id: result.id,
+      },
     });
   } catch (error) {
     console.log("Error in server", error.message);
@@ -52,7 +54,7 @@ export const loginRestaurant = async (req, res) => {
   try {
     const { businessEmail, password } = req.body;
     if (!password) {
-      return res.status(400).json({ message: "Please enter your password" });
+      return res.status(400).json({ message: "All fields are required" });
     }
     const restaurantExists = await restaurantModel.findOne({ businessEmail });
     if (!restaurantExists) {
@@ -75,9 +77,10 @@ export const loginRestaurant = async (req, res) => {
     return res.status(200).json({
       message: "Restaurant login successfull",
       token,
-      restaurant: {
+      user: {
         restaurantName: restaurantExists.restaurantName,
         role: restaurantExists.role,
+        res_id: restaurantExists._id,
       },
     });
   } catch (error) {
