@@ -30,7 +30,9 @@ baseURL.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.log("Error :", error.response.data.message);
       localStorage.removeItem("token");
-      window.location.href = "/";
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     }
     return Promise.reject(error);
   },

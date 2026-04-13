@@ -13,7 +13,10 @@ const Login = () => {
   const handleLogin = async (e) => {
     try {
       e.preventDefault();
-      const result = await api.post("/auth/login", { email, password });
+      const result = await api.post("/auth/loginRestaurant", {
+        email,
+        password,
+      });
       if (result.status == 200) {
         localStorage.setItem("token", result.data.token);
         assignUserDetails(result.data.user);

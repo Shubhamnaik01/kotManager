@@ -48,11 +48,13 @@ export const registerRestaurant = async (req, res) => {
 
 export const loginRestaurant = async (req, res) => {
   try {
-    const { businessEmail, password } = req.body;
+    const { email, password } = req.body;
     if (!password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    const restaurantExists = await restaurantModel.findOne({ businessEmail });
+    const restaurantExists = await restaurantModel.findOne({
+      businessEmail: email,
+    });
     if (!restaurantExists) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
