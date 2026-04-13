@@ -33,9 +33,11 @@ export const registerRestaurant = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
-    return res
-      .status(201)
-      .json({ message: "Restaurant registered successfully", token });
+    return res.status(201).json({
+      message: "Restaurant registered successfully",
+      token,
+      restaurant: { restaurantName: result.restaurantName, role: result.role },
+    });
   } catch (error) {
     console.log("Error in server", error.message);
     if (error.name == "ValidationError") {
@@ -43,6 +45,44 @@ export const registerRestaurant = async (req, res) => {
       return res.status(400).json({ message: msg[0] });
     }
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const loginRestaurant = async (req, res) => {
+  try {
+    const { businessEmail, password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: "Please enter your password" });
+    }
+    const restaurantExists = await restaurantModel.findOne({ businessEmail });
+    if (!restaurantExists) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+    const passMatch = await bcrypt.compare(password, restaurantExists.password);
+
+    if (!passMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const token = jwt.sign(
+      {
+        res_id: restaurantExists._id,
+        role: restaurantExists.role,
+        restaurantName: restaurantExists.restaurantName,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+    return res.status(200).json({
+      message: "Restaurant login successfull",
+      token,
+      restaurant: {
+        restaurantName: restaurantExists.restaurantName,
+        role: restaurantExists.role,
+      },
+    });
+  } catch (error) {
+    console.log("Error in server", error.message);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
