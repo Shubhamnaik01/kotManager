@@ -34,11 +34,7 @@ export const registerRestaurant = async (req, res) => {
     return res.status(201).json({
       message: "Restaurant registered successfully",
       token,
-      user: {
-        restaurantName: result.restaurantName,
-        role: result.role,
-        res_id: result.id,
-      },
+      user: { name: result.restaurantName, role: result.role, _id: result.id },
     });
   } catch (error) {
     console.log("Error in server", error.message);
@@ -78,9 +74,9 @@ export const loginRestaurant = async (req, res) => {
       message: "Restaurant login successfull",
       token,
       user: {
-        restaurantName: restaurantExists.restaurantName,
+        name: restaurantExists.restaurantName,
         role: restaurantExists.role,
-        res_id: restaurantExists._id,
+        _id: restaurantExists._id,
       },
     });
   } catch (error) {

@@ -20,11 +20,7 @@ const Register = () => {
         password,
       });
       if (result?.status == 201) {
-        assignUserDetails({
-          _id: result.data.user.res_id,
-          role: result.data.user.role,
-          name: result.data.user.restaurantName,
-        });
+        assignUserDetails(result.data.user);
         localStorage.setItem("token", result.data.token);
         notification(result.data.message, "success");
         navigate("/home", { replace: true });
