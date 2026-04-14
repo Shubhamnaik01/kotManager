@@ -87,29 +87,37 @@ export const loginRestaurant = async (req, res) => {
   }
 };
 
-export const registerUser = async (req, res) => {
+export const registerStaff = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+    const res_id = req.user.res_id;
+    if (!password || password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be atleast 6 characters" });
+    }
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(409).json({ message: "User already exisits" });
     }
     const hashedPassword = await bcrypt.hash(password, saltRound);
 
-    const result = await User.create({ name, email, password: hashedPassword });
+    const result = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      res_id,
+      role,
+    });
 
-    const token = jwt.sign(
-      {
-        _id: result._id,
-        role: result.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
     res.status(201).json({
       message: "User Registered",
-      token,
-      user: { _id: result._id, name: result.name, role: result.role },
+      user: {
+        _id: result._id,
+        name: result.name,
+        role: result.role,
+        res_id: result.res_id,
+      },
     });
   } catch (error) {
     console.log("Error while creating the user in server :", error.message);
@@ -117,7 +125,7 @@ export const registerUser = async (req, res) => {
       const msg = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: msg.join(" ") });
     }
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
