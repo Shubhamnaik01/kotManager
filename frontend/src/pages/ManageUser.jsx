@@ -5,10 +5,12 @@ import TableData from "../components/TableData";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import Nav from "../components/Nav";
+import { currentTabStore } from "../store/useNavigationStore";
 
 const ManageUser = () => {
   const [users, setUsers] = useState([]);
   const { role } = useAuthStore();
+  const { selectManageUsers } = currentTabStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,10 +37,14 @@ const ManageUser = () => {
       }
     }
   };
+
+  useEffect(() => {
+    selectManageUsers();
+  }, []);
   return (
-    <>
+    <div className="flex flex-col">
       <Nav />
-      <div className="w-full h-dvh flex justify-center items-center">
+      <div className="w-full flex justify-center items-center">
         <table className="w-xl max-w-full">
           <thead>
             <tr className=" bg-black text-white p-4 text-center">
@@ -55,7 +61,7 @@ const ManageUser = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 };
 

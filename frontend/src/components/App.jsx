@@ -6,8 +6,8 @@ import Register from "../pages/Register";
 import AddItem from "../pages/AddItem";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import Loading from "./Loading";
 import ManageUser from "../pages/ManageUser";
+import CreateStaff from "../pages/CreateStaff";
 function App() {
   const [socket, setSocket] = useState(null);
   const { role } = useAuthStore();
@@ -24,9 +24,9 @@ function App() {
       return;
     }
 
-    if (role == "admin") {
-      navigate("/manageUser");
-    }
+    // if (role == "admin") {
+    //   navigate("/manageUser");
+    // }
 
     const wsProtocol = window.location.protocol == "https:" ? "wss" : "ws";
     const host =
@@ -58,6 +58,10 @@ function App() {
         <Route
           path="/manageUser"
           element={!role ? <Login /> : <ManageUser />}
+        />
+        <Route
+          path="/createStaff"
+          element={!role ? <Login /> : <CreateStaff />}
         />
         <Route
           path="/createItem"

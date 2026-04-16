@@ -10,9 +10,13 @@ const Nav = (props) => {
     isItem,
     isOrder,
     isAddItem,
+    isManageUsers,
+    isCreateStaff,
     selectAddItem,
     selectItems,
     selectOrders,
+    selectManageUsers,
+    selectCreateStaff,
     resetTabs,
   } = currentTabStore();
 
@@ -60,6 +64,28 @@ const Nav = (props) => {
               className={isAddItem ? "text-orange-400 underline" : ""}
             >
               Create Item
+            </li>
+          )}
+          {role == "admin" && (
+            <li
+              onClick={() => {
+                selectManageUsers();
+                navigate("/manageUser");
+              }}
+              className={isManageUsers ? "text-orange-400 underline" : ""}
+            >
+              Manage Users
+            </li>
+          )}
+          {role == "admin" && (
+            <li
+              onClick={() => {
+                // selectCreateStaff();
+                navigate("/createStaff");
+              }}
+              className={isCreateStaff ? "text-orange-400 underline" : ""}
+            >
+              Create Staff
             </li>
           )}
         </ul>

@@ -7,11 +7,15 @@ export const currentTabStore = create(
       isItem: true,
       isOrder: false,
       isAddItem: false,
+      isManageUsers: false,
+      isCreateStaff: false,
       selectItems: () => {
         set({
           isItem: true,
           isOrder: false,
           isAddItem: false,
+          isManageUsers: false,
+          isCreateStaff: false,
         });
       },
       selectOrders: () => {
@@ -19,6 +23,8 @@ export const currentTabStore = create(
           isItem: false,
           isOrder: true,
           isAddItem: false,
+          isManageUsers: false,
+          isCreateStaff: false,
         });
       },
       selectAddItem: () => {
@@ -26,6 +32,26 @@ export const currentTabStore = create(
           isItem: false,
           isOrder: false,
           isAddItem: true,
+          isManageUsers: false,
+          isCreateStaff: false,
+        });
+      },
+      selectManageUsers: () => {
+        set({
+          isItem: false,
+          isOrder: false,
+          isAddItem: false,
+          isManageUsers: true,
+          isCreateStaff: false,
+        });
+      },
+      selectCreateStaff: () => {
+        set({
+          isItem: false,
+          isOrder: false,
+          isAddItem: false,
+          isManageUsers: false,
+          isCreateStaff: true,
         });
       },
       resetTabs: () => set({ isItem: true, isOrder: false, isAddItem: false }),
@@ -36,6 +62,8 @@ export const currentTabStore = create(
         isItem: state.isItem,
         isOrder: state.isOrder,
         isAddItem: state.isAddItem,
+        isManageUsers: state.isManageUsers,
+        isCreateStaff: state.isCreateStaff,
       }),
     },
   ),
