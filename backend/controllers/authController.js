@@ -49,36 +49,47 @@ export const registerRestaurant = async (req, res) => {
 export const loginRestaurant = async (req, res) => {
   try {
     const { email, password } = req.body;
+    let currentUser;
     if (!password) {
       return res.status(400).json({ message: "All fields are required" });
     }
     const restaurantExists = await restaurantModel.findOne({
       businessEmail: email,
     });
-    if (!restaurantExists) {
+    const userExists = await User.findOne({ email });
+    if (!restaurantExists && !userExists) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-    const passMatch = await bcrypt.compare(password, restaurantExists.password);
+
+    if (userExists) {
+      currentUser = userExists;
+    } else if (restaurantExists) {
+      currentUser = restaurantExists;
+    }
+
+    const passMatch = await bcrypt.compare(password, currentUser.password);
 
     if (!passMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    const token = jwt.sign(
-      {
-        res_id: restaurantExists._id,
-        role: restaurantExists.role,
-        restaurantName: restaurantExists.restaurantName,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
+    const userinfo = {
+      _id: currentUser._id,
+      role: currentUser.role,
+      res_id: restaurantExists ? currentUser._id : currentUser.res_id,
+      restaurantName: restaurantExists
+        ? currentUser.restaurantName
+        : currentUser.name,
+    };
+    const token = jwt.sign(userinfo, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
     return res.status(200).json({
-      message: "Restaurant login successfull",
+      message: `${restaurantExists ? "Restaurant" : "User"} login successfull`,
       token,
       user: {
-        name: restaurantExists.restaurantName,
-        role: restaurantExists.role,
-        _id: restaurantExists._id,
+        name: restaurantExists ? currentUser.restaurantName : currentUser.name,
+        role: currentUser.role,
+        _id: currentUser._id,
       },
     });
   } catch (error) {
@@ -129,29 +140,30 @@ export const registerStaff = async (req, res) => {
   }
 };
 
-export const userLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const userExits = await User.findOne({ email });
-    if (!userExits) {
-      return res.status(400).json({ message: "Invalid User" });
-    }
-    const passMatch = await bcrypt.compare(password, userExits.password);
-    if (!passMatch) {
-      return res.status(401).json({ message: "Invalid Credentials" });
-    }
-    const token = jwt.sign(
-      { id: userExits._id, role: userExits.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
-    return res.status(200).json({
-      message: "User login successfull",
-      token,
-      user: { _id: userExits._id, name: userExits.name, role: userExits.role },
-    });
-  } catch (error) {
-    console.log("Error in Server while logging in", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+// Seprate User/Staff Login>>>>>
+// export const userLogin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const userExits = await User.findOne({ email });
+//     if (!userExits) {
+//       return res.status(400).json({ message: "Invalid User" });
+//     }
+//     const passMatch = await bcrypt.compare(password, userExits.password);
+//     if (!passMatch) {
+//       return res.status(401).json({ message: "Invalid Credentials" });
+//     }
+//     const token = jwt.sign(
+//       { id: userExits._id, role: userExits.role },
+//       process.env.JWT_SECRET,
+//       { expiresIn: "1d" },
+//     );
+//     return res.status(200).json({
+//       message: "User login successfull",
+//       token,
+//       user: { _id: userExits._id, name: userExits.name, role: userExits.role },
+//     });
+//   } catch (error) {
+//     console.log("Error in Server while logging in", error.message);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
