@@ -11,7 +11,7 @@ const Home = ({ socket }) => {
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const { role } = useAuthStore();
-  const { isItem, isOrder } = currentTabStore();
+  const { isItem, isOrder, selectItems, selectOrders } = currentTabStore();
 
   const updateOrder = async (newData) => {
     try {
@@ -147,8 +147,10 @@ const Home = ({ socket }) => {
   useEffect(() => {
     if (isItem) {
       getAllItems();
+      selectItems();
     } else {
       getAllOrders();
+      selectOrders();
     }
   }, [isItem]);
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import api from "../lib/axiosBase";
 import notification from "../lib/toastNotify";
@@ -11,7 +11,7 @@ const AddItem = () => {
   const [cuisine, setCuisine] = useState("");
   const [foodType, setFoodType] = useState("");
   const [price, setPrice] = useState({});
-  const { selectItems } = currentTabStore();
+  const { selectItems, selectAddItem } = currentTabStore();
 
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
@@ -62,6 +62,10 @@ const AddItem = () => {
       }
     }
   };
+
+  useEffect(() => {
+    selectAddItem();
+  }, []);
   return (
     <>
       <Nav />

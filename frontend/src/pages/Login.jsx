@@ -21,7 +21,12 @@ const Login = () => {
         localStorage.setItem("token", result.data.token);
         assignUserDetails(result.data.user);
         notification(result.data.message, "success");
-        navigate("/home", { replace: true });
+        console.log(result.data.user.role);
+        if (result.data.user.role == "admin") {
+          navigate("/manageUser", { replace: true });
+        } else {
+          navigate("/home", { replace: true });
+        }
       }
     } catch (error) {
       if (error.response?.data?.message) {

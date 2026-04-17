@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import ManageUser from "../pages/ManageUser";
 import CreateStaff from "../pages/CreateStaff";
+import AdminProtectedRoute from "./AdminProtectedRoute";
+import CounterProtectedRoute from "./CounterProtectedRoute";
 function App() {
   const [socket, setSocket] = useState(null);
   const { role } = useAuthStore();
@@ -50,30 +52,69 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={role ? <Navigate to="/home" /> : <Login />} />
+        <Route
+          path="/"
+          element={
+            role ? (
+              role == "admin" ? (
+                <Navigate to="/manageUser" />
+              ) : (
+                <Navigate to="/home" />
+              )
+            ) : (
+              <Login />
+            )
+          }
+        />
         <Route
           path="/register"
-          element={role ? <Navigate to="/home" /> : <Register />}
+          element={
+            role ? (
+              role == "admin" ? (
+                <Navigate to="/manageUser" />
+              ) : (
+                <Navigate to="/home" />
+              )
+            ) : (
+              <Register />
+            )
+          }
         />
         <Route
           path="/manageUser"
-          element={!role ? <Login /> : <ManageUser />}
+          element={
+            <AdminProtectedRoute>
+              <ManageUser />
+            </AdminProtectedRoute>
+          }
         />
         <Route
           path="/createStaff"
-          element={!role ? <Login /> : <CreateStaff />}
+          element={
+            <AdminProtectedRoute>
+              <CreateStaff />
+            </AdminProtectedRoute>
+          }
         />
         <Route
           path="/createItem"
-          element={!role ? <Navigate to="/" replace={true} /> : <AddItem />}
+          element={
+            <CounterProtectedRoute>
+              <AddItem />
+            </CounterProtectedRoute>
+          }
         />
         <Route
           path="/home"
           element={
-            !role ? (
-              <Navigate to="/" replace={true} />
+            role ? (
+              role == "admin" ? (
+                <Navigate to="/manageUser" />
+              ) : (
+                <Home socket={socket} />
+              )
             ) : (
-              <Home socket={socket} />
+              <Navigate to="/" />
             )
           }
         />
@@ -96,3 +137,51 @@ function App() {
 }
 
 export default App;
+
+// return (
+//     <div>
+//       <Routes>
+//         <Route path="/" element={role ? <Navigate to="/home" /> : <Login />} />
+//         <Route
+//           path="/register"
+//           element={role ? <Navigate to="/home" /> : <Register />}
+//         />
+//         <Route
+//           path="/manageUser"
+//           element={!role ? <Login /> : <ManageUser />}
+//         />
+//         <Route
+//           path="/createStaff"
+//           element={!role ? <Login /> : <CreateStaff />}
+//         />
+//         <Route
+//           path="/createItem"
+//           element={!role ? <Navigate to="/" replace={true} /> : <AddItem />}
+//         />
+//         <Route
+//           path="/home"
+//           element={
+//             !role ? (
+//               <Navigate to="/" replace={true} />
+//             ) : (
+//               <Home socket={socket} />
+//             )
+//           }
+//         />
+//       </Routes>
+//       <ToastContainer
+//         position="top-center"
+//         autoClose={5000}
+//         hideProgressBar={false}
+//         newestOnTop={false}
+//         closeOnClick
+//         rtl={false}
+//         pauseOnFocusLoss
+//         draggable
+//         pauseOnHover
+//         theme="dark"
+//         transition={Flip}
+//       />
+//     </div>
+//   );
+// Commented to test recreate the bug later
