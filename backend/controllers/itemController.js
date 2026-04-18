@@ -3,10 +3,12 @@ import Items from "../models/Items.js";
 export const createItem = async (req, res) => {
   try {
     const { itemName, price, cuisine, foodType } = req.body;
+    const res_id = req.user.res_id;
     const lowerCaseFoodType = foodType.toLowerCase();
     const sameItem = await Items.findOne({
       itemName,
       cuisine,
+      res_id,
       foodType: lowerCaseFoodType,
     });
     if (sameItem) {
@@ -16,6 +18,7 @@ export const createItem = async (req, res) => {
       itemName,
       price,
       cuisine,
+      res_id,
       foodType: lowerCaseFoodType,
     });
     console.log(result);
@@ -33,7 +36,7 @@ export const createItem = async (req, res) => {
 export const updateItem = async (req, res) => {
   try {
     const updates = req.body;
-    const item_id = req.params.id;
+    const _id = req.params.id;
     const finalUpdate = { ...updates };
     console.log(finalUpdate.price);
     if (updates.price) {
@@ -42,8 +45,8 @@ export const updateItem = async (req, res) => {
       delete finalUpdate.price;
     }
 
-    const result = await Items.findByIdAndUpdate(
-      item_id,
+    const result = await Items.findOneAndUpdate(
+      { _id, res_id: req.user.res_id },
       { $set: finalUpdate },
       { new: true, runValidators: true },
     );
@@ -65,8 +68,11 @@ export const updateItem = async (req, res) => {
 
 export const deleteItem = async (req, res) => {
   try {
-    const id = req.params.id;
-    const result = await Items.findByIdAndDelete(id);
+    const _id = req.params.id;
+    const result = await Items.findOneAndDelete({
+      _id,
+      res_id: req.user.res_id,
+    });
 
     if (!result) {
       return res.status(404).json({ message: "Item not found" });
@@ -82,7 +88,8 @@ export const deleteItem = async (req, res) => {
 
 export const getAllItems = async (req, res) => {
   try {
-    const result = await Items.find();
+    const res_id = req.user.res_id;
+    const result = await Items.find({ res_id });
     return res
       .status(200)
       .json({ message: "Get all items successfull", data: result });

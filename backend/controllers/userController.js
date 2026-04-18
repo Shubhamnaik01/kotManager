@@ -7,8 +7,8 @@ export const changeRole = async (req, res) => {
     if (!newRole || typeof newRole !== "string") {
       return res.status(400).json({ message: "Invalid Role" });
     }
-    const result = await userModel.findByIdAndUpdate(
-      _id,
+    const result = await userModel.findOneAndUpdate(
+      { _id, res_id: req.user.res_id },
       {
         $set: { role: newRole.toLowerCase() },
       },
@@ -33,7 +33,10 @@ export const changeRole = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const _id = req.params.id;
-    const deletedUser = await userModel.findByIdAndDelete(_id);
+    const deletedUser = await userModel.findOneAndDelete({
+      _id,
+      res_id: req.user.res_id,
+    });
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -49,7 +52,8 @@ export const deleteUser = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    const result = await userModel.find().select("-password");
+    const res_id = req.user.res_id;
+    const result = await userModel.find({ res_id }).select("-password");
     if (result.length == 0) {
       return res
         .status(200)

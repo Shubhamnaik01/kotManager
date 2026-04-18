@@ -14,6 +14,11 @@ const orderSchema = new mongoose.Schema(
       min: [1, "The order should have atleast one quantity"],
       required: true,
     },
+    res_id: {
+      type: mongoose.Schema.Types.ObjectID,
+      ref: "Restaurant",
+      required: [true, "Valid Restaurant is required"],
+    },
     cuisine: { type: String, required: true },
     foodType: { type: String, enum: ["veg", "non-veg"], required: true },
   },
