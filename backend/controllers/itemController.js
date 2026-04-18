@@ -28,7 +28,7 @@ export const createItem = async (req, res) => {
       const msg = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: msg[0] });
     }
-    console.log("Error in server while creating item", error.message);
+    console.log("Error in server while creating Item", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -61,7 +61,7 @@ export const updateItem = async (req, res) => {
       const msg = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: msg[0] });
     }
-    console.log("Error in server while updating notes", error.message);
+    console.log("Error in server while updating Item", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -79,9 +79,9 @@ export const deleteItem = async (req, res) => {
     }
     res
       .status(200)
-      .json({ message: "The item is Deleted", deletedItem: result });
+      .json({ message: "The Item is Deleted", deletedItem: result });
   } catch (error) {
-    console.log("Error in server while deleting note", error.message);
+    console.log("Error in server while deleting Item", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
