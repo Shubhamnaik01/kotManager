@@ -28,8 +28,27 @@ const TableData = (props) => {
     }
   };
 
+  const deleteUser = async () => {
+    try {
+      const result = await api.delete("/users/delete/" + props.data._id);
+
+      if (result.status == 200) {
+        props.updateUserArray(props.data._id);
+        notification(result.data.message, "success");
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        notification(error.response.data.message, "error");
+      } else if (error.request) {
+        notification("Server not reachable or Internal server error", "error");
+      } else {
+        console.log("Error in code", error.message);
+      }
+    }
+  };
+
   return (
-    <tr>
+    <tr className="text-center">
       <td>{props.data.name}</td>
       <td>{props.data.email}</td>
       <td>
@@ -73,6 +92,16 @@ const TableData = (props) => {
             </button>
           </div>
         )}
+      </td>
+      <td>
+        <button
+          className="p-1 bg-gray-600 text-white rounded-md"
+          onClick={() => {
+            deleteUser();
+          }}
+        >
+          Delete
+        </button>
       </td>
     </tr>
   );

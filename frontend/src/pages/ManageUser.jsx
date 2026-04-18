@@ -38,28 +38,47 @@ const ManageUser = () => {
     }
   };
 
+  const removeUserInArray = (_id) => {
+    setUsers((prev) => {
+      return prev.filter((i) => i._id != _id);
+    });
+  };
+
   useEffect(() => {
     selectManageUsers();
   }, []);
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-dvh">
       <Nav />
-      <div className="w-full flex justify-center items-center">
-        <table className="w-xl max-w-full">
-          <thead>
-            <tr className=" bg-black text-white p-4 text-center">
-              <th className="p-2">Name</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Role</th>
-              <th className="p-2">Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((i) => {
-              return <TableData data={i} key={i._id} />;
-            })}
-          </tbody>
-        </table>
+      <div className="flex-1 flex justify-center items-start my-4 mx-4">
+        {users.length <= 0 ? (
+          <div className="h-2/5 w-full flex justify-center items-center">
+            <h1>No users please create !</h1>
+          </div>
+        ) : (
+          <table className="w-full max-w-4xl">
+            <thead>
+              <tr className=" bg-black text-white p-4 text-center">
+                <th className="p-2">Name</th>
+                <th className="p-2">Email</th>
+                <th className="p-2">Role</th>
+                <th className="p-2">Edit</th>
+                <th className="p-2">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((i) => {
+                return (
+                  <TableData
+                    data={i}
+                    key={i._id}
+                    updateUserArray={removeUserInArray}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
