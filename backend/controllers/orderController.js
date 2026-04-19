@@ -3,13 +3,18 @@ import Order from "../models/Orders.js";
 export const createNewOrder = async (req, res) => {
   try {
     const { foodType } = req.body;
-    const lowerCaseFoodType = foodType.toLowerCase();
+    const lowerCaseFoodType = foodType?.toLowerCase();
     const result = await Order.create({
       ...req.body,
       foodType: lowerCaseFoodType,
+      res_id: req.user.res_id,
     });
     req.wss.clients.forEach((client) => {
-      if (client.role == "kitchen" && client.readyState == 1) {
+      if (
+        client.role == "kitchen" &&
+        client.readyState == 1 &&
+        client.res_id == req.user.res_id
+      ) {
         client.send(JSON.stringify({ type: "NewOrder", payload: result }));
       }
     });
@@ -19,9 +24,7 @@ export const createNewOrder = async (req, res) => {
 
     if (error.name == "ValidationError") {
       const msg = Object.values(error.errors).map((err) => err.message);
-      return res
-        .status(400)
-        .json({ message: "Validation error", message: msg[0] });
+      return res.status(400).json({ message: msg[0] });
     }
     res.status(500).json({ message: "Internal server error" });
   }
@@ -29,10 +32,10 @@ export const createNewOrder = async (req, res) => {
 
 export const updateOrder = async (req, res) => {
   try {
-    const order_id = req.params.id;
-    const lowerCaseFoodType = req.body.foodType.toLowerCase();
-    const result = await Order.findByIdAndUpdate(
-      order_id,
+    const _id = req.params.id;
+    const lowerCaseFoodType = req.body.foodType?.toLowerCase();
+    const result = await Order.findOneAndUpdate(
+      { _id, res_id: req.user.res_id },
       { $set: { ...req.body, foodType: lowerCaseFoodType } },
       { new: true, runValidators: true },
     );
@@ -40,7 +43,11 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ message: "Order does not exisit" });
     }
     req.wss.clients.forEach((client) => {
-      if (client.role == "kitchen") {
+      if (
+        client.role == "kitchen" &&
+        client.readyState == 1 &&
+        client.res_id == req.user.res_id
+      ) {
         client.send(JSON.stringify({ type: "Update", payload: result }));
       }
     });
@@ -57,15 +64,18 @@ export const updateOrder = async (req, res) => {
 
 export const deleteOrder = async (req, res) => {
   try {
-    const order_id = req.params.id;
-    const result = await Order.findByIdAndDelete(order_id);
+    const _id = req.params.id;
+    const result = await Order.findOneAndDelete({
+      _id,
+      res_id: req.user.res_id,
+    });
     if (!result) {
       return res.status(400).json({ message: "Order does not exist" });
     }
     req.wss.clients.forEach((client) => {
       // console.log("<<<<Delted Controler>>>>>");
       // console.log(`Socket ID: ${client.id} | Role: ${client.role}`);
-      if (client.readyState === 1) {
+      if (client.readyState === 1 && client.res_id == req.user.res_id) {
         // if (client.role == "kitchen") {     Order can  be delted by both client and kitchen in case of unavailability of raw material
         client.send(JSON.stringify({ type: "Delete", payload: result }));
         // } else {
@@ -84,10 +94,10 @@ export const deleteOrder = async (req, res) => {
 
 export const updateStatusOnly = async (req, res) => {
   try {
-    const order_id = req.params.id;
+    const _id = req.params.id;
     const { orderStatus } = req.body;
-    const result = await Order.findByIdAndUpdate(
-      order_id,
+    const result = await Order.findOneAndUpdate(
+      { _id, res_id: req.user.res_id },
       { $set: { orderStatus } },
       { new: true, runValidators: true },
     );
@@ -95,14 +105,14 @@ export const updateStatusOnly = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Order does not exist" });
     }
-    console.log("update succssfull");
+    console.log("Update successfull");
 
     req.wss.clients.forEach((client) => {
       // console.log(
       //   `DEBUG: ID=${client.id} | Role=${client.role} | Status=${client.readyState}`,
       // );
       if (client.readyState == 1) {
-        if (client.role == "counter") {
+        if (client.res_id == req.user.res_id) {
           client.send(
             JSON.stringify({ type: "UpdateOnlyStatus", payload: result }),
           );
@@ -120,8 +130,8 @@ export const updateStatusOnly = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find();
-    res.status(200).json({ message: "All notes fetched", data: orders });
+    const orders = await Order.find({ res_id: req.user.res_id });
+    res.status(200).json({ message: "All orders fetched", data: orders });
   } catch (error) {
     console.log("Error while getting all orders in server", error.message);
     res.status(500).json({ message: "Internal server error" });

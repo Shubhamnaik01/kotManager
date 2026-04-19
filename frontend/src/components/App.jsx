@@ -41,6 +41,7 @@ function App() {
         JSON.stringify({
           role: role,
           name: `User-${role}`,
+          token: localStorage.getItem("token"),
         }),
       );
       setSocket(ws);

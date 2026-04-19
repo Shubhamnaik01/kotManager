@@ -10,6 +10,8 @@ import { WebSocketServer } from "ws";
 import path from "path";
 import cors from "cors";
 import Order from "./models/Orders.js";
+import jwt from "jsonwebtoken";
+import { env } from "process";
 
 dotenv.config();
 
@@ -58,7 +60,7 @@ connectDB().then(() => {
     console.log("Client connected"); // every ws object represents individual client connection stored in Set named clients in wss object
     ws.id = Math.random().toString(36).substr(2, 9);
     ws.on("message", async (message) => {
-      console.log("Message sent from the client :", message.toString());
+      // console.log("Message sent from the client :", message.toString());
       const data = JSON.parse(message.toString());
 
       // if (data.type == "update") {
@@ -73,10 +75,16 @@ connectDB().then(() => {
       //     }
       //   });
       // }
+
+      const res_id = jwt.verify(data.token, process.env.JWT_SECRET).res_id;
+      // console.log(res_id);
       if (data.role) {
         ws.role = data.role;
         ws.name = data.name;
-        console.log(`Socket ${ws.id} is now identified as: ${ws.role}`);
+        ws.res_id = res_id;
+        console.log(
+          `Socket ${ws.id} is now identified as: ${ws.role} , with res_id ${ws.res_id}`,
+        );
         if (ws.role == "kitchen" && ws.readyState == 1) {
           const existingData = await Order.find({ orderStatus: "pending" });
           // const existingOrder = JSON.stringify(existingData);
